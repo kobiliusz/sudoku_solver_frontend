@@ -1,16 +1,12 @@
 <template>
-    <v-container fluid>
-        <!-- Loop for each 3x3 region row -->
+    <v-container>
         <v-row v-for="regionRow in 3" :key="'regionRow-' + regionRow" class="region-row">
-            <!-- Loop for each 3x3 region column -->
             <v-col cols="4" v-for="regionCol in 3" :key="'regionCol-' + regionCol" class="region-col">
                 <v-sheet outlined tile class="pa-3 region">
-                    <!-- Inner 3x3 grid for text fields -->
                     <v-row v-for="row in 3" :key="'row-' + row">
                         <v-col cols="4" v-for="col in 3" :key="'col-' + col">
-                            <v-text-field outlined dense single-line
-                                :hint="`R${(regionRow - 1) * 3 + row}, C${(regionCol - 1) * 3 + col}`" :rules="[validateCharacter]"
-                                class="text-field"></v-text-field>
+                            <input class="no-input" inputmode="numeric" :id="generateId(regionRow, regionCol, row, col)"
+                                maxlength="1" @input="validateCharacter" />
                         </v-col>
                     </v-row>
                 </v-sheet>
@@ -23,68 +19,92 @@
 export default {
     name: 'SudokuGrid',
     methods: {
-        validateCharacter(value) {
-            const pattern = /^[1-9]?$/;
-            return pattern.test(value) || 'Input must be an integer between 1 and 9 or empty.';
+        validateCharacter(e) {
+            const value = e.target.value;
+            const validPattern = /^[1-9]?$/;
+            if (!validPattern.test(value)) {
+                e.target.value = '';
+            }
         },
-    },
+        generateId(regionRow, regionCol, row, col) {
+            const actualRow = (regionRow - 1) * 3 + row - 1;
+            const actualCol = (regionCol - 1) * 3 + col - 1;
+            return `input-${actualRow}-${actualCol}`;
+        },
+        collectPuzzleData() {
+            let req_data = {};
+            let puzzle = [];
+
+            for (let row = 0; row < 9; row++) {
+                let row_data = [];
+
+                for (let col = 0; col < 9; col++) {
+                    const inputId = `input-${row}-${col}`;
+                    const inputElement = document.getElementById(inputId);
+                    const value = parseInt(inputElement.value, 10);
+                    row_data.push(!isNaN(value) ? value : 0);
+                }
+                puzzle.push(row_data);
+            }
+
+            req_data['puzzle'] = puzzle;
+
+            const url = "http://127.0.0.1:8000/solve/";
+
+            // Use fetch to send a POST request
+            fetch(url, {
+                method: 'POST', // Specify the request method
+                headers: {
+                    'Content-Type': 'application/json', // Indicate that you're sending JSON data
+                },
+                body: JSON.stringify(req_data), // Convert the JavaScript object to a JSON string
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        // If the response is not 2xx, throw an error
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json(); // Parse the JSON response body
+                })
+                .then(data => {
+                    console.log(data); // Handle the response data
+                })
+                .catch(error => {
+                    console.error('There was a problem with your fetch operation:', error);
+                });
+        },
+    }
 }
 </script>
   
 <style>
 .region-row {
-    margin-bottom: 8px;
-    /* Adjust spacing between region rows for visual clarity */
+    margin: 0px;
+    padding: 0px;
 }
 
 .region-col {
-    padding: 0 4px;
-    /* Adjust spacing between region columns for visual clarity */
-    border-right: 2px solid black;
-    /* Vertical lines */
-}
-
-.region-col:last-child {
-    border-right: none;
+    margin: 0px;
+    padding: 0px;
 }
 
 .region-row:last-child .region-col {
     border-bottom: none;
-    /* Avoid double border at the bottom of the last row */
 }
 
 .v-sheet.region {
     border: 2px solid black;
-    /* Border around each region for clear division */
-    margin: 4px;
-    /* Space between regions */
+    margin: 0px;
 }
 
-.text-field {
-    margin-top: -8px;
-    /* Adjust if necessary to decrease the size of the text field */
-    margin-bottom: -8px;
-    /* Adjust if necessary for tighter packing */
+.no-input {
     border: 1px solid black;
+    width: 20px;
+    text-align: center;
 }
 
-.v-text-field--outlined .v-input__control {
-    min-height: 40px;
-    /* Adjust for smaller height */
+.v-container {
+    margin-top: 30px;
+    max-width: 480px !important;
 }
-
-.v-text-field .v-label {
-    font-size: 0.875rem;
-    /* Smaller label font size */
-}
-
-.v-text-field .v-text-field__slot {
-    font-size: 0.875rem;
-    /* Smaller input text */
-}
-
-/* Additional adjustments for spacing and alignment */
-.v-container.fluid {
-    padding-left: 0;
-    padding-right: 0;
-}</style>
+</style>

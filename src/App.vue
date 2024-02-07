@@ -15,10 +15,26 @@
         </span>
         <v-divider></v-divider>
       </v-navigation-drawer>
-      <SudokuGrid/>
+      <SudokuGrid ref="sudokuGrid" />
+      <v-btn class="d-block mx-auto my-10" variant="tonal" @click="solve">
+        Solve
+      </v-btn>
+      <v-btn class="d-block mx-auto my-10" variant="tonal">
+        Reset
+      </v-btn>
     </v-main>
   </v-app>
 </template>
+
+<script>
+export default {
+  methods: {
+    solve() {
+      this.$refs.sudokuGrid.collectPuzzleData();
+    },
+  },
+}
+</script>
 
 <script setup>
 //
