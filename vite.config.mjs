@@ -27,7 +27,8 @@ export default defineConfig({
     }),
   ],
   build: {
-    outDir: '../frontend'
+    outDir: '../frontend',
+    build: "vite build --emptyOutDir",
   },
   define: { 'process.env': {'NODE_ENV': 'production'} },
   resolve: {
