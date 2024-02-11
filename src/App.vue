@@ -13,13 +13,19 @@
           minus odit voluptatem consequatur fugiat totam tempore neque veniam fugit qui officia vero, iste dolore est
           delectus.
         </span>
-        <v-divider></v-divider>
+        <v-divider/>
+        <span>
+          Lorem ipsum dolor sit, amet consectetur adipisicing elit. Repellat blanditiis, velit laboriosam consequuntur,
+          minus odit voluptatem consequatur fugiat totam tempore neque veniam fugit qui officia vero, iste dolore est
+          delectus.
+        </span>
       </v-navigation-drawer>
-      <SudokuGrid ref="sudokuGrid" />
-      <v-btn class="d-block mx-auto my-10" variant="tonal" @click="solve">
+      <UnsolvableDialog ref="unsDialog" />
+      <SudokuGrid ref="sudokuGrid" @unsolvable="unsolv" />
+      <v-btn class="d-block mx-auto my-10" color="primary" @click="solve">
         Solve
       </v-btn>
-      <v-btn class="d-block mx-auto my-10" variant="tonal">
+      <v-btn class="d-block mx-auto my-10" variant="tonal" color="error" @click="reset">
         Reset
       </v-btn>
     </v-main>
@@ -32,10 +38,17 @@ export default {
     solve() {
       this.$refs.sudokuGrid.collectPuzzleData();
     },
+    reset() {
+      this.$refs.sudokuGrid.resetPuzzle();
+    },
+    unsolv() {
+      console.log('Unsolvable puzzle!');
+      this.$refs.unsDialog.activate();
+    }
   },
 }
 </script>
 
 <script setup>
-//
+import UnsolvableDialog from './components/UnsolvableDialog.vue';
 </script>

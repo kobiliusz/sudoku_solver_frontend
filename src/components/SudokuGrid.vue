@@ -2,9 +2,9 @@
     <v-container>
         <v-row v-for="regionRow in 3" :key="'regionRow-' + regionRow" class="region-row">
             <v-col cols="4" v-for="regionCol in 3" :key="'regionCol-' + regionCol" class="region-col">
-                <v-sheet outlined tile class="pa-3 region">
+                <v-sheet outlined class="pa-3 region">
                     <v-row v-for="row in 3" :key="'row-' + row">
-                        <v-col cols="4" v-for="col in 3" :key="'col-' + col">
+                        <v-col cols="4" v-for="col in 3" :key="'col-' + col" class="cell">
                             <input class="no-input" inputmode="numeric" :id="generateId(regionRow, regionCol, row, col)"
                                 maxlength="1" @input="validateCharacter" />
                         </v-col>
@@ -42,6 +42,10 @@ export default {
                     const inputId = `input-${row}-${col}`;
                     const inputElement = document.getElementById(inputId);
                     const value = parseInt(inputElement.value, 10);
+                    if (!isNaN(value)) {
+                        inputElement.classList.add("puzzle-no");
+                    }
+                    inputElement.readOnly = true;
                     row_data.push(!isNaN(value) ? value : 0);
                 }
                 puzzle.push(row_data);
@@ -60,18 +64,42 @@ export default {
                 body: JSON.stringify(req_data), // Convert the JavaScript object to a JSON string
             })
                 .then(response => {
-                    if (!response.ok) {
+                    if (response.status == 406) {
+                        this.$emit('unsolvable');
+                        return null;
+                    } if (!response.ok) {
                         // If the response is not 2xx, throw an error
                         throw new Error('Network response was not ok');
                     }
                     return response.json(); // Parse the JSON response body
                 })
                 .then(data => {
+                    if (data == null) {
+                        return;
+                    }
                     console.log(data); // Handle the response data
+                    for (let row = 0; row < 9; row++) {
+                        for (let col = 0; col < 9; col++) {
+                            const inputId = `input-${row}-${col}`;
+                            const inputElement = document.getElementById(inputId);
+                            inputElement.value = data['solution'][row][col];
+                        }
+                    }
                 })
                 .catch(error => {
                     console.error('There was a problem with your fetch operation:', error);
                 });
+        },
+        resetPuzzle() {
+            for (let row = 0; row < 9; row++) {
+                for (let col = 0; col < 9; col++) {
+                    const inputId = `input-${row}-${col}`;
+                    const inputElement = document.getElementById(inputId);
+                    inputElement.value = "";
+                    inputElement.classList.remove("puzzle-no");
+                    inputElement.readOnly = false;
+                }
+            }
         },
     }
 }
@@ -93,18 +121,28 @@ export default {
 }
 
 .v-sheet.region {
-    border: 2px solid black;
+    border: 3px solid black;
     margin: 0px;
 }
 
 .no-input {
-    border: 1px solid black;
+    border: 0px solid black;
     width: 20px;
+    height: 20px;
     text-align: center;
+}
+
+.puzzle-no {
+    font-weight: bold;
+}
+
+.cell {
+    border: 1px solid black;
 }
 
 .v-container {
     margin-top: 30px;
     max-width: 480px !important;
+    line-height: 20px;
 }
 </style>
