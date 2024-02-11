@@ -53,7 +53,15 @@ export default {
 
             req_data['puzzle'] = puzzle;
 
-            const url = "http://127.0.0.1:8000/solve/";
+            var env = process.env.NODE_ENV || 'development';
+
+            var url;
+
+            if (env == 'development') {
+                url = "http://127.0.0.1:8000/solve/"
+            } else {
+                url = "/solve/"
+            }
 
             // Use fetch to send a POST request
             fetch(url, {

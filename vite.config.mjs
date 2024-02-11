@@ -26,7 +26,10 @@ export default defineConfig({
       },
     }),
   ],
-  define: { 'process.env': {} },
+  build: {
+    outDir: '../frontend'
+  },
+  define: { 'process.env': {'NODE_ENV': 'production'} },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
