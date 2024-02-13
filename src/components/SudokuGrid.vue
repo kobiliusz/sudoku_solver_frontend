@@ -1,23 +1,34 @@
 <template>
-    <v-container>
-        <v-row v-for="regionRow in 3" :key="'regionRow-' + regionRow" class="region-row">
-            <v-col cols="4" v-for="regionCol in 3" :key="'regionCol-' + regionCol" class="region-col">
-                <v-sheet outlined class="pa-3 region">
-                    <v-row v-for="row in 3" :key="'row-' + row">
-                        <v-col cols="4" v-for="col in 3" :key="'col-' + col" class="cell">
-                            <input class="no-input" inputmode="numeric" :id="generateId(regionRow, regionCol, row, col)"
-                                maxlength="1" @input="validateCharacter" />
-                        </v-col>
-                    </v-row>
-                </v-sheet>
-            </v-col>
-        </v-row>
-    </v-container>
+        <v-container>
+            <v-card class="board">
+            <v-row v-for="regionRow in 3" :key="'regionRow-' + regionRow" class="region-row">
+                <v-col cols="4" v-for="regionCol in 3" :key="'regionCol-' + regionCol" class="region-col">
+                    <v-sheet outlined class="pa-3 region">
+                        <v-row v-for="row in 3" :key="'row-' + row">
+                            <v-col cols="4" v-for="col in 3" :key="'col-' + col" class="cell">
+                                <input class="no-input" inputmode="numeric" :id="generateId(regionRow, regionCol, row, col)"
+                                    maxlength="1" @input="validateCharacter" />
+                            </v-col>
+                        </v-row>
+                    </v-sheet>
+                </v-col>
+            </v-row>
+            <v-overlay v-model="isLoading" class="align-center justify-center" contained>
+            <v-progress-circular color="primary" indeterminate size="64"></v-progress-circular>
+        </v-overlay>
+        </v-card>
+        </v-container>
+        
 </template>
   
 <script>
 export default {
     name: 'SudokuGrid',
+    data() {
+        return {
+            isLoading: false
+        };
+    },
     methods: {
         validateCharacter(e) {
             const value = e.target.value;
@@ -63,6 +74,8 @@ export default {
                 url = "/solve/"
             }
 
+            this.isLoading = true;
+
             // Use fetch to send a POST request
             fetch(url, {
                 method: 'POST', // Specify the request method
@@ -96,7 +109,12 @@ export default {
                 })
                 .catch(error => {
                     console.error('There was a problem with your fetch operation:', error);
+                })
+                .finally(a => {
+                    this.isLoading = false;
                 });
+
+            
         },
         resetPuzzle() {
             for (let row = 0; row < 9; row++) {
@@ -153,4 +171,9 @@ export default {
     max-width: 480px !important;
     line-height: 20px;
 }
+
+.board {
+    box-shadow: none !important;
+}
+
 </style>
