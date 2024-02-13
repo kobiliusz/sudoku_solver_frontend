@@ -22,7 +22,7 @@
       </v-navigation-drawer>
       <UnsolvableDialog ref="unsDialog" />
       <SudokuGrid ref="sudokuGrid" @unsolvable="unsolv" />
-      <v-btn class="d-block mx-auto my-10" color="primary" @click="solve">
+      <v-btn class="d-block mx-auto my-10" color="primary" @click="solve" :disabled="solveDisabled">
         Solve
       </v-btn>
       <v-btn class="d-block mx-auto my-10" variant="tonal" color="error" @click="reset">
@@ -34,12 +34,20 @@
 
 <script>
 export default {
+  data() {
+    return {
+      solveDisabled: false,
+      solveLook: "primary"
+    };
+  },
   methods: {
     solve() {
+      this.solveDisabled = true;
       this.$refs.sudokuGrid.collectPuzzleData();
     },
     reset() {
       this.$refs.sudokuGrid.resetPuzzle();
+      this.solveDisabled = false;
     },
     unsolv() {
       console.log('Unsolvable puzzle!');
@@ -52,3 +60,4 @@ export default {
 <script setup>
 import UnsolvableDialog from './components/UnsolvableDialog.vue';
 </script>
+
