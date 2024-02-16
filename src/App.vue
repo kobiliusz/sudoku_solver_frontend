@@ -9,9 +9,7 @@
         <v-btn color="primary" class="mx-8" @click="showIns">Instructions</v-btn>
       </v-app-bar>
       <v-navigation-drawer>
-        <span>
           
-        </span>
         <v-divider/>
         <span>
           
