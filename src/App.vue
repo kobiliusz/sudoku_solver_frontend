@@ -9,8 +9,7 @@
         <v-btn color="primary" class="mx-8" @click="showIns">Instructions</v-btn>
       </v-app-bar>
       <v-navigation-drawer>
-        <!--AD 1-->
-        <div id="container-c3f2f1187fd9d1dea9e0c50f7e8356c6"></div>
+        
       </v-navigation-drawer>
       <UnsolvableDialog ref="unsDialog" />
       <Instructions ref="instructions"/>
